@@ -6,10 +6,21 @@ import timeit
 debug = True
 
 
-# CHANGES TO MAKE/TRY:
-#       Replace recursive entry function with global variable that stores positions (and values?) to update
+''' 
+CHANGES TO MAKE/TRY:
+    Add function to identify naked pairs in rows columns and boxes
+        Idea to compare all sets in the same box with length two to see if same? Then uses indices of notes to identify
+        position.
+    Add function for hidden pairs in rows columns and boxes
+        Idea for both of these is a 4-D list: outer list for each number, next layer for each box in grid, next layer 
+        for each row of each box, final layer for index of column in each row. Then we compare each number's grid to 
+        each other one and look for overlap that would indicate hidden pairs, trios...others?
+    Replace recursive entry function with global variable that stores positions (and values?) to update
+    
+'''
 
-class sudoku:
+
+class Sudoku:
 
     def __init__(self, grid):
         # initiate attributes
@@ -78,7 +89,8 @@ class sudoku:
             print(str(self.boxs[k]))
         '''
 
-    # return the box number, 1-9 (Left to right and top to bottom), and indices of the box bounds for the given position in a 9x9 sudoku grid
+    # return the box number, 1-9 (Left to right and top to bottom), and indices of the box bounds for the given position
+    # in a 9x9 sudoku grid
     def boxVals(self, i, j):
         imin = 0
         imax = 0
@@ -128,28 +140,27 @@ class sudoku:
 
         return [bnum, [imin, imax], [jmin,jmax]]
 
-
-    # update notes in each undetermined cell (only undetermined cells should have notes based on contents of the determined cells it is connected to - those in the same row, column, and box.
+    # update set of notes in each undetermined cell - only undetermined cells have notes - based on contents of the
+    # determined cells it is connected to, those in the same row, column, and box.
     def rowcolboxNotes(self):
         self.updated = False
         for i in range(self.od):
             for j in range(self.od):
                 if type(self.grid[i][j]) == set:
-                    supSet = self.rows[i].union(self.cols[j], self.boxs[self.boxVals(i,j)[0]])
+                    supSet = self.rows[i].union(self.cols[j], self.boxs[self.boxVals(i, j)[0]])
                     self.grid[i][j] = self.grid[i][j].difference(supSet)
-                    # use evalct (evaluation count) to prevent running updateNakedSingle function until all notes are accurate
+                    # use evalct (evaluation count) to prevent running updateNakedSingle function
+                    # until all notes are accurate
                     if self.evalct >= 1:
                         if len(self.grid[i][j]) == 1:
-                            self.updateNakedSingle(i,j)
+                            self.updateNakedSingle(i, j)
         self.evalct += 1
+        # calls itself again when notes have been filled in fully for first time to evaluate for nakedSingles
         if self.evalct == 1:
             self.rowcolboxNotes()
-        # print(self.evalct)
-        # print(self.updated)
-        # print(self.cmpltnct)
 
-
-    # fill in a cell that has only 1 number remaining in its notes with that number and update all attributes accordingly
+    # fill in a cell that has only 1 number remaining in its notes with that number
+    # and update all attributes accordingly
     def updateNakedSingle(self, i, j):
         if self.cmpltnct == self.od**2:
             return
@@ -191,7 +202,6 @@ class sudoku:
         else:
             return
 
-
     # Identify hidden singles and "reveal" them by finding the difference between each cell's notes and the superset of
     # all other cells' notes in its row, column, and box, and seeing if it's exactly 1
     def discoverSingles(self):
@@ -203,23 +213,25 @@ class sudoku:
                     rsupSet = set()
                     for x in range(self.od):
                         if x != i and type(self.grid[x][j]) == set:
-                            rsupSet = rsupSet.union(self.grid[x][j])
+                            rsupSet.update(self.grid[x][j])
                     diff = temp - rsupSet
                     if len(diff) == 1:
                         self.grid[i][j] = diff
-                        print("Single Found: {} in Row: {}, Col: {} from row diff = {} - {}".format(diff, i, j, temp, supSet))
+                        print("Single Found: {} in Row: {}, Col: {} from row diff = {} - {}".format(diff, i, j, temp, rsupSet))
                         self.updateNakedSingle(i, j)
+                        break
 
-                    #column difference check
+                    # column difference check
                     csupSet = set()
                     for y in range(self.od):
                         if y != j and type(self.grid[i][y]) == set:
-                            csupSet = csupSet.union(self.grid[i][y])
+                            csupSet.update(self.grid[i][y])
                     diff = temp - csupSet
                     if len(diff) == 1:
                         self.grid[i][j] = diff
-                        print("Single Found: {} in Row: {}, Col: {} from column diff = {} - {}".format(diff, i, j, temp, supSet))
+                        print("Single Found: {} in Row: {}, Col: {} from column diff = {} - {}".format(diff, i, j, temp, csupSet))
                         self.updateNakedSingle(i, j)
+                        break
 
                     # box difference check
                     bsupSet = set()
@@ -227,16 +239,12 @@ class sudoku:
                     for x in range(bvals[1][0], bvals[1][1]):
                         for y in range(bvals[2][0], bvals[2][1]):
                             if (x != i or y != j) and type(self.grid[x][y]) == set:
-                                bsupSet = bsupSet.union(self.grid[x][y])
+                                bsupSet.update(self.grid[x][y])
                     diff = temp - bsupSet
                     if len(diff) == 1:
                         self.grid[i][j] = diff
-                        print("Single Found: {} in Row: {}, Col: {} from box diff = {} - {}".format(diff, i, j, temp, supSet))
+                        print("Single Found: {} in Row: {}, Col: {} from box diff = {} - {}".format(diff, i, j, temp, bsupSet))
                         self.updateNakedSingle(i, j)
-
-
-
-
 
 
 def main():
@@ -269,7 +277,7 @@ def main():
     lines = []
     for line in file.readlines():
         if line == '\n':
-            ## SHOULD CHECK IF LIST IS EMPTY FIRST TO HANDLE CASE WHERE MORE THAN ONE EMPTY LINE BETWEEN GRIDS
+            # SHOULD CHECK IF LIST IS EMPTY FIRST TO HANDLE CASE WHERE MORE THAN ONE EMPTY LINE BETWEEN GRIDS
             grids.append(lines)
             lines=[]
         else:
@@ -286,16 +294,18 @@ def main():
                 print(row)
             print('')
 
-
     for grid in grids:
-        sudoku(grid).solve()
+        Sudoku(grid).solve()
 
     toc = time.perf_counter()
     elapsed = toc-tic
 
     print('Time taken: ' + str(elapsed))
     file.close()
+
+
 main()
+
 
 '''
 emeryEzP2 for second puzzle in sudoku solver
