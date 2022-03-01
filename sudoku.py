@@ -50,7 +50,7 @@ class sudoku:
             self.discoverSingles()
 
         print(self.evalct)
-        print("\nFinal", end=" ")
+        print("\nFinal", end = " ")
         self.printGrid()
 
     # print the values in the main grid, and the nested sets for all rows and columns and boxes
@@ -193,22 +193,45 @@ class sudoku:
 
 
     # Identify hidden singles and "reveal" them by finding the difference between each cell's notes and the superset of
-    # all other cells' notes in its box and seeing if it's exactly 1
+    # all other cells' notes in its row, column, and box, and seeing if it's exactly 1
     def discoverSingles(self):
         for i in range(self.od):
             for j in range(self.od):
                 temp = self.grid[i][j]
                 if type(temp) == set:
+                    # row difference check
+                    rsupSet = set()
+                    for x in range(self.od):
+                        if x != i and type(self.grid[x][j]) == set:
+                            rsupSet = rsupSet.union(self.grid[x][j])
+                    diff = temp - rsupSet
+                    if len(diff) == 1:
+                        self.grid[i][j] = diff
+                        print("Single Found: {} in Row: {}, Col: {} from row diff = {} - {}".format(diff, i, j, temp, supSet))
+                        self.updateNakedSingle(i, j)
+
+                    #column difference check
+                    csupSet = set()
+                    for y in range(self.od):
+                        if y != j and type(self.grid[i][y]) == set:
+                            csupSet = csupSet.union(self.grid[i][y])
+                    diff = temp - csupSet
+                    if len(diff) == 1:
+                        self.grid[i][j] = diff
+                        print("Single Found: {} in Row: {}, Col: {} from column diff = {} - {}".format(diff, i, j, temp, supSet))
+                        self.updateNakedSingle(i, j)
+
+                    # box difference check
+                    bsupSet = set()
                     bvals = self.boxVals(i,j)
-                    supSet = set()
                     for x in range(bvals[1][0], bvals[1][1]):
                         for y in range(bvals[2][0], bvals[2][1]):
                             if (x != i or y != j) and type(self.grid[x][y]) == set:
-                                supSet = supSet.union(self.grid[x][y])
-                    diff = temp - supSet
+                                bsupSet = bsupSet.union(self.grid[x][y])
+                    diff = temp - bsupSet
                     if len(diff) == 1:
                         self.grid[i][j] = diff
-                        print("Single Found: {} in Row: {}, Col: {} from diff = {} - {}".format(diff, i, j, temp, supSet))
+                        print("Single Found: {} in Row: {}, Col: {} from box diff = {} - {}".format(diff, i, j, temp, supSet))
                         self.updateNakedSingle(i, j)
 
 
