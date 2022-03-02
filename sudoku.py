@@ -11,10 +11,22 @@ CHANGES TO MAKE/TRY:
     Add function to identify naked pairs in rows columns and boxes
         Idea to compare all sets in the same box with length two to see if same? Then uses indices of notes to identify
         position.
+            0. Check for cell with notes of length 2 for its set
+            1. Identify two #s contained
+            2. Check row/column/box to see if both numbers only appear twice
+            3. Check row/column/box to see if another cell contains both numbers
+            3. If two cells in same row/column/box contain the only two instances of the same two numbers, remove the 
+                notes for all other numbers from both cells
     Add function for hidden pairs in rows columns and boxes
+            1. Check each row/column/box for # of occurrences of each # in notes
+            2. Determine all combinations of #s that appear twice
+            3. check all cells in row/column/box ot see if they contain both of each combination
+            4. If two cells contain two numbers that both only appear twice, remove all other notes
+            
         Idea for both of these is a 4-D list: outer list for each number, next layer for each box in grid, next layer 
         for each row of each box, final layer for index of column in each row. Then we compare each number's grid to 
         each other one and look for overlap that would indicate hidden pairs, trios...others?
+    
     Replace recursive entry function with global variable that stores positions (and values?) to update
     
 '''
