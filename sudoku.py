@@ -7,9 +7,24 @@ debug = True
 
 
 ''' 
-testing
 CHANGES TO MAKE/TRY:
+    Naked Subset - set of cells with the exact same notes of ONLY the possible numbers (as many as there are cells) that can be there
+    in the same row, column or box. This indicates those cells can only be those numbers and the notes for all other 
+    connected cells should be updated.
+    Hidden Subset - set of cells in same row, column, or box that are the only place that a set of numbers appear 
+    (equal amount of candidates to the # of cells).
+    * Note: Neither of these cases require that all candidates be in all cells, only that the # of candidate only appear in the same # of cells
+    Didn't take this into account below...
+    
     Add function to identify naked pairs in rows columns and boxes
+        * Notes:
+        Naked pairs aren't needed for updating notes in the box they're in because this code begins with all
+        notes being possible and removes notes, as opposed to filling in notes from scratch. This means a naked pair found
+        in a box won't change any of the notes in that box because, by definition, those numbers' notes are only in that
+        box. This also means that the notes in the same row or column of a naked pair need to be updated according to the
+        numbers that make up that naked pair when they are on the same row or column (regardless of if they're in the same block).
+        But, since we are only removing notes and not adding them, we don't have to worry about naked pairs becoming hidden as well.
+        
         Idea to compare all sets in the same box with length two to see if same? Then uses indices of notes to identify
         position.
             0. Check for cell with notes of length 2 for its set
@@ -18,16 +33,26 @@ CHANGES TO MAKE/TRY:
             3. Check row/column/box to see if another cell contains both numbers
             3. If two cells in same row/column/box contain the only two instances of the same two numbers, remove the 
                 notes for all other numbers from both cells
+                
     Add function for hidden pairs in rows columns and boxes
-            1. Check each row/column/box for # of occurrences of each # in notes
-            2. Determine all combinations of #s that appear twice
-            3. check all cells in row/column/box ot see if they contain both of each combination
-            4. If two cells contain two numbers that both only appear twice, remove all other notes
+        *Notes:
+        Plan
+            1. Check each row/column/box for # of occurrences of each # in their cells' notes
+            2. Determine all combinations of #s that appear twice (or any # of times [2-8] for most comprehensive method)
+            3. check all cells in row/column/box to see if they contain both of each combination 
+            (or the same amount of cells as # of occurrences of #s involved if comprehensive)
+            4. If two cells contain two numbers that both only appear twice, remove all other notes in those cells and 
+            remove those numbers from the notes of all other connected cells
             
         Idea for both of these is a 4-D list: outer list for each number, next layer for each box in grid, next layer 
         for each row of each box, final layer for index of column in each row. Then we compare each number's grid to 
         each other one and look for overlap that would indicate hidden pairs, trios...others?
     
+    Scanning Technique 4: Eliminating notes from rows columns and boxes based on notes in other boxes
+    
+    https://www.conceptispuzzles.com/index.aspx?uri=puzzle/sudoku/techniques
+    http://hodoku.sourceforge.net/en/tech_intersections.php
+
     Replace recursive entry function with global variable that stores positions (and values?) to update
     
 '''
