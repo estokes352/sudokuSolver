@@ -7,6 +7,7 @@ debug = True
 
 
 ''' 
+testing
 CHANGES TO MAKE/TRY:
     Add function to identify naked pairs in rows columns and boxes
         Idea to compare all sets in the same box with length two to see if same? Then uses indices of notes to identify
