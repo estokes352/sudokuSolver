@@ -84,7 +84,7 @@ class Sudoku:
                     self.cmpltnct+=1
                     self.rows[i].add(temp)
                     self.cols[j].add(temp)
-                    boxNum = self.boxVals(i,j)[0]
+                    boxNum = self.boxVals(i, j)[0]
                     self.boxs[boxNum].add(temp)
 
     # run logical checks in order of difficulty from easiest to hardest repeatedly to solve sudoku puzzle
@@ -98,8 +98,12 @@ class Sudoku:
             # Identify hidden singles and make them naked and call function to fill them in.
             self.discoverSingles()
 
+        # bifurcate if incomplete. no longer updating notes (not sure how to track through recursion)
+        # if self.cmpltnct < self.od**2:
+        #     self.bifurcate()
+
         print(self.evalct)
-        print("\nFinal", end = " ")
+        print("\nFinal", end=" ")
         self.printGrid()
 
     # print the values in the main grid, and the nested sets for all rows and columns and boxes
@@ -283,6 +287,40 @@ class Sudoku:
                         self.grid[i][j] = diff
                         print("Single Found: {} in Row: {}, Col: {} from box diff = {} - {}".format(diff, i, j, temp, bsupSet))
                         self.updateNakedSingle(i, j)
+
+    # verify grid is valid
+    def check(self, cur_idx, temp):
+
+
+    # solve with recursive guess and check from self.grid with notes
+        # idea to use unpacking to pass all grid variables between recursive calls without having to create new grid.
+        # This way notes can be passed between grids, updated, and used for checking the validity of the grid. Not currently used.
+    def bifurcate(self, prev_idx=False, prev_notes=False, cur_idx=False, next_idx=False):
+        # starting from scratch
+        if not cur_idx:
+            # identify starting empty cell and rerun
+            count = 0
+            for i in range(self.od):
+                for j in range(self.od):
+                    if type(self.grid[i][j]) == set:
+                        if count == 0:
+                            cur_idx = [i, j]
+                            count += 1
+                        elif count == 1:
+                            next_idx = [i, j]
+                            break
+        # starting from first empty cell
+        if not prev_idx:
+            # check values in notes until valid
+            temp = self.grid[cur_idx[0]][cur_idx[1]].pop()
+            while not self.check(cur_idx, temp):
+                temp = self.grid[cur_idx[0]][cur_idx[1]].pop()
+
+
+
+
+
+        self.bifurcate(prev_idx, prev_notes, cur_idx, next_idx)
 
 
 def main():
